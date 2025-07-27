@@ -35,20 +35,19 @@ gaming_study_data = gaming_study_data.dropna(subset='SPIN_Total')
 
 #Create list from Name column of top_50_data to use for column name for new dataframe created from Tags column
 top_50_names = top_50_data['Name'].tolist()
-top_50_tag_list = top_50_data['Tags'].tolist()
-#top_50_tags = pd.DataFrame(top_50_tag_list, columns= top_50_names)
-
-for name in top_50_names:
-    top_50_tags[name] = top_50_tag_list
+top_50_tags = top_50_data[['Tags']].transpose()
+top_50_tags.columns = top_50_names
 
 
-print(top_50_names)
+
+
+#print(top_50_names)
 
 """
 print(sales_data.head())
 print(top_50_data.head())
 print(gaming_study_data.head())
 print(online_behavior_data.head())
-
-print(top_50_tags.iloc[:,:5].head())
 """
+print(top_50_tags.iloc[:,:5].head())
+
