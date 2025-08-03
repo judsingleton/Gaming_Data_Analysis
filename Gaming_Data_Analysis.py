@@ -27,7 +27,7 @@ online_behavior_data = online_behavior_data.drop('PlayerID', axis=1)
 
 #Remove all game series from sales data as well as cross-platform entries as these have no sales
 
-sales_data = sales_data.drop(sales_data[sales_data['Platform'] == ('Series' or 'All')].index)
+sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series')) |(sales_data['Platform'] == ('All'))].index)
 
 
 #Remove rows with NA for SPIN
@@ -35,19 +35,48 @@ gaming_study_data = gaming_study_data.dropna(subset='SPIN_Total')
 
 #Create list from Name column of top_50_data to use for column name for new dataframe created from Tags column
 top_50_names = top_50_data['Name'].tolist()
-top_50_tags = top_50_data[['Tags']].transpose()
-top_50_tags.columns = top_50_names
+top_50_tags = top_50_data[['Tags']]
+top_50_tags.index = top_50_names
+top_50_tags['Singleplayer'] = False
+top_50_tags['Multiplayer'] = False
+
+#Find Singleplayer and Multiplayer tags and set value of corresponding column to True if found
+
+#def list_extract():
+
+for name in top_50_names:
+    taglist = top_50_tags.loc[name, 'Tags']
+    if "Singleplayer" in taglist:
+        top_50_tags.loc[name, 'Singleplayer'] = True
+    else:
+        top_50_tags.loc[name, 'Singleplayer'] = False    
+    if "Multiplayer" in taglist:
+        top_50_tags.loc[name, 'Multiplayer'] = True
+    else:
+        top_50_tags.loc[name, 'Multiplayer'] = False
 
 
 
 
-#print(top_50_names)
 
-"""
-print(sales_data.head())
-print(top_50_data.head())
-print(gaming_study_data.head())
-print(online_behavior_data.head())
-"""
-print(top_50_tags.iloc[:,:5].head())
+#print(top_50_tags.iloc[:,:5].head())
 
+#Open the SQL connection and create a cursor
+
+conn = sqlite3.connect(':memory:') 
+cursor = conn.cursor()
+
+def sql(query):
+    """Input a SQL query and return a pandas dataframe object."""
+    return pd.read_sql_query(query, conn)
+
+#Load our data into SQL tables
+
+sales_data.to_sql('Sales', conn, if_exists='replace', index=False)
+top_50_data.to_sql('Top_50', conn, if_exists='replace', index=False)
+gaming_study_data.to_sql('Gaming_Study', conn, if_exists='replace', index=False)
+online_behavior_data.to_sql('Online_Behavior', conn, if_exists='replace', index=False)
+
+
+
+conn.close()
