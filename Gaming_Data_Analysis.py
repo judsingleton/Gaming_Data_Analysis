@@ -22,44 +22,69 @@ online_behavior_data.rename(columns={"GameGenre": "Genre", "PlayTimeHours": "Hou
 
 sales_data = sales_data.drop(['Publisher', 'Developer', 'Critic_Score'], axis=1)
 top_50_data = top_50_data.drop(['Publishers', 'Developers', 'Steam Id'], axis=1)
+top_50_data = top_50_data.drop(top_50_data.columns[0], axis=1)
 gaming_study_data = gaming_study_data.drop(['S. No.', 'Timestamp', 'GADE', 'earnings', 'whyplay', 'League', 'highestleague', 'streams', 'Birthplace', 'Residence', 'Reference', 'accept', 'Birthplace_ISO3'], axis=1)
 online_behavior_data = online_behavior_data.drop('PlayerID', axis=1)
 
-#Remove all game series from sales data as well as cross-platform entries as these have no sales
+#Convert any necessary columns to correct data type
+sales_data['Name'] = sales_data['Name'].astype(str)
 
-sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series')) |(sales_data['Platform'] == ('All'))].index)
 
+#Remove all game series from sales data as well as cross-platform entries as these have no sales figures and/or are also broken out by entry and platform
+
+sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series'))].index)
+sales_data = sales_data.dropna(subset="Global_Sales")
+#sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series')) |(sales_data['Platform'] == ('All'))].index)
+
+#For games with multiple entries that have sales data, create one row per title (not series) combining sales from all platforms
+
+sales_data['Multiplatform'] = sales_data.duplicated(subset='Name', keep=False)
+multi_list = sales_data.duplicated(subset='Name', keep=False).drop_duplicates().to_list()
+
+def sales_total(title: str):
+    """Calculates total sales across all platforms for titles in the sales_data dataframe with multiple rows.  
+    Only rows with values in the Global_Sales column are included in the calculation."""
+    title_data = sales_data.loc[sales_data['Name'] == title].reset_index()
+    #May need to change column value if more columns are dropped 8-3-2025
+    return title_data.iloc[[0, (title_data.shape[0] - 1)], 11].sum()
+
+
+
+#print(sales_total("Grand Theft Auto V", "Global_Sales"))
 
 #Remove rows with NA for SPIN
 gaming_study_data = gaming_study_data.dropna(subset='SPIN_Total')
 
 #Create list from Name column of top_50_data to use for column name for new dataframe created from Tags column
 top_50_names = top_50_data['Name'].tolist()
-top_50_tags = top_50_data[['Tags']]
-top_50_tags.index = top_50_names
-top_50_tags['Singleplayer'] = False
-top_50_tags['Multiplayer'] = False
+top_50_data.index = top_50_names
+top_50_data['Singleplayer'] = False
+top_50_data['Multiplayer'] = False
+
+#Utility function to check whether an element exists in a list of strings.
+
+def list_check(selement: str, lelement: list[str]):
+    """For a dataframe column consisting of lists of strings, return True if the tag exists in the list and False if it does not."""
+    return selement in lelement
 
 #Find Singleplayer and Multiplayer tags and set value of corresponding column to True if found
 
-#def list_extract():
-
 for name in top_50_names:
-    taglist = top_50_tags.loc[name, 'Tags']
-    if "Singleplayer" in taglist:
-        top_50_tags.loc[name, 'Singleplayer'] = True
+    taglist = top_50_data.loc[name, 'Tags']
+    if list_check('Singleplayer', taglist):
+        top_50_data.loc[name, 'Singleplayer'] = True
     else:
-        top_50_tags.loc[name, 'Singleplayer'] = False    
-    if "Multiplayer" in taglist:
-        top_50_tags.loc[name, 'Multiplayer'] = True
+        top_50_data.loc[name, 'Singleplayer'] = False    
+    if list_check('Multiplayer', taglist):
+        top_50_data.loc[name, 'Multiplayer'] = True
     else:
-        top_50_tags.loc[name, 'Multiplayer'] = False
+        top_50_data.loc[name, 'Multiplayer'] = False
 
 
 
 
 
-#print(top_50_tags.iloc[:,:5].head())
+#print(top_50_data.iloc[:,:5].head())
 
 #Open the SQL connection and create a cursor
 
@@ -78,5 +103,14 @@ gaming_study_data.to_sql('Gaming_Study', conn, if_exists='replace', index=False)
 online_behavior_data.to_sql('Online_Behavior', conn, if_exists='replace', index=False)
 
 
+
+test = sql("""
+    SELECT Price, Singleplayer, Multiplayer
+    FROM Top_50
+    INNER JOIN Gaming_Study ON Gaming_Study.Name = Top_50.Name;
+    """)
+
+test.to_csv("test.csv", index=False)
+print(sales_data.head())
 
 conn.close()
