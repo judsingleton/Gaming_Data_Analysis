@@ -20,7 +20,7 @@ online_behavior_data.rename(columns={"GameGenre": "Genre", "PlayTimeHours": "Hou
 
 #Drop unnecessary columns from dataframe
 
-sales_data = sales_data.drop(['Publisher', 'Developer', 'Critic_Score'], axis=1)
+sales_data = sales_data.drop(['Publisher', 'Developer', 'Critic_Score', 'NA_Sales', 'PAL_Sales', 'JP_Sales', 'Other_Sales'], axis=1)
 top_50_data = top_50_data.drop(['Publishers', 'Developers', 'Steam Id'], axis=1)
 top_50_data = top_50_data.drop(top_50_data.columns[0], axis=1)
 gaming_study_data = gaming_study_data.drop(['S. No.', 'Timestamp', 'GADE', 'earnings', 'whyplay', 'League', 'highestleague', 'streams', 'Birthplace', 'Residence', 'Reference', 'accept', 'Birthplace_ISO3'], axis=1)
@@ -35,54 +35,81 @@ sales_data['Name'] = sales_data['Name'].astype(str)
 sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series'))].index)
 sales_data = sales_data.dropna(subset="Global_Sales")
 
-
 #For games with multiple entries that have sales data, add the sum of Global_Sales to the title (not series) from all platforms for the title
 
 sales_data['Multiplatform'] = sales_data.duplicated(subset='Name', keep=False)
-multi_series = sales_data['Name'].value_counts()
-multi_list = multi_series[multi_series > 1].index.to_list()
+
+
+def duplist(temp_df):
+    """Provides a list of values in the Name field  of the sales_data that appear more than once.  Only exact matches are returned."""
+    multi_series = sales_data['Name'].value_counts()
+    multi_list = multi_series[multi_series > 1].index.to_list()
+    multi_list = list(set(multi_list))
+    return multi_list
+
 
 #If there is a title with multiple rows but no row where the Platform value is All, create a new row for the title.
 #Genre and Year values will be based taken from the earliest release year.
 
-mask = sales_data['Name'].isin(multi_list)
+mask = sales_data['Name'].isin(duplist(sales_data))
 placeholder = sales_data[mask] #dataframe with only titles with more than one entry
 #might need to drop some or all NaN or zero entries for Global Sales
 
-for name in multi_list:
-    sub_mask = placeholder['Name'] == name
-    sub_placeholder = placeholder[sub_mask] #dataframe with all rows for a single title
-    for row in range(len(sub_placeholder.index)):
-        if 'All' in sub_placeholder['Platform'].unique():
-            break
-        else:
-         #dataframe with only one row to be appended to sales_data
-            temp_df = sub_placeholder.loc[sub_placeholder['Year'] == sub_placeholder['Year'].min()].reset_index(drop=False)
-            temp_df[0, 3] = 'All'
-            temp_df[0, 10] = sub_placeholder['Global_Sales'].sum()
-            pd.concat([sales_data, temp_df])
-            
+placeholder = placeholder[placeholder['Global_Sales'] != 0.0]
+plist = placeholder['Name'].to_list()
+
+title_list = [] #A list of dataframes, with each list element being for one game title
+
+for i in range(len(plist)):
+    temp_df = placeholder[placeholder['Name'] == plist[i]]
+    title_list.append(temp_df)
+
+def title_gs_calc(title_df):
+    """Takes a dataframe with multiple rows for a title and returns a datframe with a single row with the Global_Sales calculated."""
+    return_df = title_df.head(1).reset_index()
+    return_df['Platform'] = 'All'
+    return_df['Global_Sales'] = title_df['Global_Sales'].sum()    
+    return return_df
+
+def title_add(tlist):
+    """Takes a list of dataframe consisting of the same title and returns a dataframe that with All for the Platform value and the sum of the columns for Global_Sales."""
+    added_titles = pd.DataFrame()
+    for i in range(len(tlist)):
+        temp_df = title_gs_calc(tlist[i])
+        added_titles = pd.concat([added_titles, temp_df], ignore_index=True)
+        added_titles = added_titles.drop_duplicates()
+    return added_titles
+
+sales_data = pd.concat([sales_data, title_add(title_list)], ignore_index=True)
+sales_data = sales_data.reset_index(drop=True)
 
 
-def sales_total(title: str):
-    """Calculates total sales across all platforms for titles in the sales_data dataframe with multiple rows.  
-    Only rows with values in the Global_Sales column are included in the calculation."""
-    title_data = sales_data.loc[sales_data['Name'] == title].reset_index()
-    return title_data["Global_Sales"].sum()
+remove_title_list = duplist(sales_data)
+rows_to_remove = sales_data[sales_data['Name'].isin(remove_title_list)].index.to_list()
+rows_to_save = sales_data[sales_data['Platform'] == 'All']
 
-print(sales_total("Tetris"))
 
-def calc_sales(m_list):
-    """Pass in the sales dataframe and calculate total sales for each title with a Platform value of 'All'."""
-    s_data = sales_data.reset_index(drop=True)
-    print(s_data.head())
-    gstotal = 0.0
-    for i in range(len(m_list)):
-        gstotal = sales_total(m_list[i])
-        sales_data.iloc[i, 10] = gstotal
-    print("Total global sales figures have been calculated.")
+"""
+def save_all_platform(rows):
+    temp_list = []  
+    for i in range(len(rows)):
+        if not sales_data.iloc[i, 2] == 'All':
+            temp_list.append(rows[i])
+    return temp_list
 
-calc_sales(multi_list)
+    
+rows_to_remove = save_all_platform(rows_to_remove)
+"""
+
+
+sales_data = sales_data.drop(rows_to_remove)
+sales_data = pd.concat([sales_data, rows_to_save], ignore_index=True)
+sales_data = sales_data.drop_duplicates()
+
+#print(sales_data['Name'].isin(['Minecraft']).any()) #REMOVE ME
+#sales_data.to_csv('test.csv') #REMOVE ME
+#sales_data = sales_data[(sales_data['Name'] == name) and (sales_data['Platform'] == 'All')]
+
 
 
         
@@ -121,7 +148,6 @@ for name in top_50_names:
 
 
 
-
 #print(top_50_data.iloc[:,:5].head())
 
 #Open the SQL connection and create a cursor
@@ -148,7 +174,7 @@ test = sql("""
     INNER JOIN Gaming_Study ON Gaming_Study.Name = Top_50.Name;
     """)
 
-test.to_csv("test.csv", index=False)
+
 
 print(sales_data.head())
 
