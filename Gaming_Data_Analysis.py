@@ -34,23 +34,61 @@ sales_data['Name'] = sales_data['Name'].astype(str)
 
 sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series'))].index)
 sales_data = sales_data.dropna(subset="Global_Sales")
-#sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series')) |(sales_data['Platform'] == ('All'))].index)
 
-#For games with multiple entries that have sales data, create one row per title (not series) combining sales from all platforms
+
+#For games with multiple entries that have sales data, add the sum of Global_Sales to the title (not series) from all platforms for the title
 
 sales_data['Multiplatform'] = sales_data.duplicated(subset='Name', keep=False)
-multi_list = sales_data.duplicated(subset='Name', keep=False).drop_duplicates().to_list()
+multi_series = sales_data['Name'].value_counts()
+multi_list = multi_series[multi_series > 1].index.to_list()
+
+#If there is a title with multiple rows but no row where the Platform value is All, create a new row for the title.
+#Genre and Year values will be based taken from the earliest release year.
+
+mask = sales_data['Name'].isin(multi_list)
+placeholder = sales_data[mask] #dataframe with only titles with more than one entry
+#might need to drop some or all NaN or zero entries for Global Sales
+
+for name in multi_list:
+    sub_mask = placeholder['Name'] == name
+    sub_placeholder = placeholder[sub_mask] #dataframe with all rows for a single title
+    for row in range(len(sub_placeholder.index)):
+        if 'All' in sub_placeholder['Platform'].unique():
+            break
+        else:
+         #dataframe with only one row to be appended to sales_data
+            temp_df = sub_placeholder.loc[sub_placeholder['Year'] == sub_placeholder['Year'].min()].reset_index(drop=False)
+            temp_df[0, 3] = 'All'
+            temp_df[0, 10] = sub_placeholder['Global_Sales'].sum()
+            pd.concat([sales_data, temp_df])
+            
+
 
 def sales_total(title: str):
     """Calculates total sales across all platforms for titles in the sales_data dataframe with multiple rows.  
     Only rows with values in the Global_Sales column are included in the calculation."""
     title_data = sales_data.loc[sales_data['Name'] == title].reset_index()
-    #May need to change column value if more columns are dropped 8-3-2025
-    return title_data.iloc[[0, (title_data.shape[0] - 1)], 11].sum()
+    return title_data["Global_Sales"].sum()
+
+print(sales_total("Tetris"))
+
+def calc_sales(m_list):
+    """Pass in the sales dataframe and calculate total sales for each title with a Platform value of 'All'."""
+    s_data = sales_data.reset_index(drop=True)
+    print(s_data.head())
+    gstotal = 0.0
+    for i in range(len(m_list)):
+        gstotal = sales_total(m_list[i])
+        sales_data.iloc[i, 10] = gstotal
+    print("Total global sales figures have been calculated.")
+
+calc_sales(multi_list)
 
 
+        
 
-#print(sales_total("Grand Theft Auto V", "Global_Sales"))
+#Now that we have the totals
+#sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series')) |(sales_data['Platform'] == ('All'))].index)
 
 #Remove rows with NA for SPIN
 gaming_study_data = gaming_study_data.dropna(subset='SPIN_Total')
@@ -111,6 +149,7 @@ test = sql("""
     """)
 
 test.to_csv("test.csv", index=False)
+
 print(sales_data.head())
 
 conn.close()
