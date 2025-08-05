@@ -27,7 +27,8 @@ gaming_study_data = gaming_study_data.drop(['S. No.', 'Timestamp', 'GADE', 'earn
 online_behavior_data = online_behavior_data.drop('PlayerID', axis=1)
 
 #Convert any necessary columns to correct data type
-sales_data['Name'] = sales_data['Name'].astype(str)
+print(sales_data.info())
+sales_data['Name'] = sales_data['Name', 'Platform', 'Genre'].astype(str)
 
 
 #Remove all game series from sales data as well as cross-platform entries as these have no sales figures and/or are also broken out by entry and platform
@@ -198,11 +199,6 @@ sales_and_study = sql("""
     LEFT JOIN Sales ON Sales.Name = Gaming_Study_Avg.Name;
     """)
 
-#print(sales_data['Name'].isin(['Minecraft']).any()) #REMOVE ME
-sales_and_study.to_csv('sales_and_study.csv') #REMOVE ME
-
-
-
-#print(sales_data.head()) REMOVE ME
+sales_and_study.to_csv('sales_and_study.csv') 
 
 conn.close()
