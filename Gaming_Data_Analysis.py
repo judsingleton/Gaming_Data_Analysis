@@ -20,7 +20,7 @@ online_behavior_data.rename(columns={"GameGenre": "Genre", "PlayTimeHours": "Hou
 
 #Drop unnecessary columns from dataframe
 
-sales_data = sales_data.drop(['Publisher', 'Developer', 'Critic_Score', 'NA_Sales', 'PAL_Sales', 'JP_Sales', 'Other_Sales'], axis=1)
+sales_data = sales_data.drop(['Publisher', 'Developer', 'Critic_Score', 'All_Platforms', 'User_Score', 'All_Games', 'NA_Sales', 'PAL_Sales', 'JP_Sales', 'Other_Sales'], axis=1)
 top_50_data = top_50_data.drop(['Publishers', 'Developers', 'Steam Id'], axis=1)
 top_50_data = top_50_data.drop(top_50_data.columns[0], axis=1)
 gaming_study_data = gaming_study_data.drop(['S. No.', 'Timestamp', 'GADE', 'earnings', 'whyplay', 'League', 'highestleague', 'streams', 'Birthplace', 'Residence', 'Reference', 'accept', 'Birthplace_ISO3'], axis=1)
@@ -35,6 +35,14 @@ sales_data['Name'] = sales_data['Name'].astype(str)
 sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series'))].index)
 sales_data = sales_data.dropna(subset="Global_Sales")
 
+#Utility function to get average value of one specified column based on given value in another column (defaults to Name).
+
+def get_average(temp_df, tlist, cname, kname='Name'):
+    for i in range(len(tlist)):
+        mask = temp_df[kname] == tlist[i]
+        average_val = temp_df[temp_df[kname] == tlist[i]][cname].mean()
+        temp_df.loc[temp_df[kname] == tlist[i], [cname+'_avg']]= average_val
+
 #For games with multiple entries that have sales data, add the sum of Global_Sales to the title (not series) from all platforms for the title
 
 sales_data['Multiplatform'] = sales_data.duplicated(subset='Name', keep=False)
@@ -46,7 +54,6 @@ def duplist(temp_df):
     multi_list = multi_series[multi_series > 1].index.to_list()
     multi_list = list(set(multi_list))
     return multi_list
-
 
 #If there is a title with multiple rows but no row where the Platform value is All, create a new row for the title.
 #Genre and Year values will be based taken from the earliest release year.
@@ -83,42 +90,13 @@ def title_add(tlist):
 sales_data = pd.concat([sales_data, title_add(title_list)], ignore_index=True)
 sales_data = sales_data.reset_index(drop=True)
 
-
 remove_title_list = duplist(sales_data)
 rows_to_remove = sales_data[sales_data['Name'].isin(remove_title_list)].index.to_list()
 rows_to_save = sales_data[sales_data['Platform'] == 'All']
 
-
-"""
-def save_all_platform(rows):
-    temp_list = []  
-    for i in range(len(rows)):
-        if not sales_data.iloc[i, 2] == 'All':
-            temp_list.append(rows[i])
-    return temp_list
-
-    
-rows_to_remove = save_all_platform(rows_to_remove)
-"""
-
-
 sales_data = sales_data.drop(rows_to_remove)
 sales_data = pd.concat([sales_data, rows_to_save], ignore_index=True)
 sales_data = sales_data.drop_duplicates()
-
-#print(sales_data['Name'].isin(['Minecraft']).any()) #REMOVE ME
-#sales_data.to_csv('test.csv') #REMOVE ME
-#sales_data = sales_data[(sales_data['Name'] == name) and (sales_data['Platform'] == 'All')]
-
-
-
-        
-
-#Now that we have the totals
-#sales_data = sales_data.drop(sales_data[(sales_data['Platform'] == ('Series')) |(sales_data['Platform'] == ('All'))].index)
-
-#Remove rows with NA for SPIN
-gaming_study_data = gaming_study_data.dropna(subset='SPIN_Total')
 
 #Create list from Name column of top_50_data to use for column name for new dataframe created from Tags column
 top_50_names = top_50_data['Name'].tolist()
@@ -146,9 +124,59 @@ for name in top_50_names:
         top_50_data.loc[name, 'Multiplayer'] = False
 
 
+#Remove rows with NA for SPIN
+gaming_study_data = gaming_study_data.dropna(subset='SPIN_Total')
+
+print(gaming_study_data.head())
+
+gmask = gaming_study_data['Name'].unique().tolist()
+
+get_average(gaming_study_data, gmask, 'GAD2')
+get_average(gaming_study_data, gmask, 'GAD3')
+get_average(gaming_study_data, gmask, 'GAD4')
+get_average(gaming_study_data, gmask, 'GAD5')
+get_average(gaming_study_data, gmask, 'GAD6')
+get_average(gaming_study_data, gmask, 'GAD7')
+get_average(gaming_study_data, gmask, 'GAD_Total')
+
+get_average(gaming_study_data, gmask, 'SWL1')
+get_average(gaming_study_data, gmask, 'SWL2')
+get_average(gaming_study_data, gmask, 'SWL3')
+get_average(gaming_study_data, gmask, 'SWL4')
+get_average(gaming_study_data, gmask, 'SWL5')
+get_average(gaming_study_data, gmask, 'SWL_Total')
+
+get_average(gaming_study_data, gmask, 'SPIN1')
+get_average(gaming_study_data, gmask, 'SPIN2')
+get_average(gaming_study_data, gmask, 'SPIN3')
+get_average(gaming_study_data, gmask, 'SPIN4')
+get_average(gaming_study_data, gmask, 'SPIN5')
+get_average(gaming_study_data, gmask, 'SPIN6')
+get_average(gaming_study_data, gmask, 'SPIN7')
+get_average(gaming_study_data, gmask, 'SPIN8')
+get_average(gaming_study_data, gmask, 'SPIN9')
+get_average(gaming_study_data, gmask, 'SPIN10')
+get_average(gaming_study_data, gmask, 'SPIN11')
+get_average(gaming_study_data, gmask, 'SPIN12')
+get_average(gaming_study_data, gmask, 'SPIN13')
+get_average(gaming_study_data, gmask, 'SPIN14')
+get_average(gaming_study_data, gmask, 'SPIN15')
+get_average(gaming_study_data, gmask, 'SPIN16')
+get_average(gaming_study_data, gmask, 'SPIN17')
+get_average(gaming_study_data, gmask, 'SPIN_Total')
+
+get_average(gaming_study_data, gmask, 'HoursPerWeek')
+
+print(gaming_study_data.head()) #REMOVE ME
+print(gaming_study_data.info()) #REMVOE ME
+
+gaming_study_avg = gaming_study_data.filter(['Name', 'HoursPerWeek_avg', 'GAD_Total_avg', 'SWL_Total_avg', 'SPIN_Total_avg'], axis=1)
+gaming_study_avg = gaming_study_avg.drop_duplicates()
+gaming_study_avg.to_csv("gaming_study_avg.csv")
+
+print(gaming_study_avg.head()) #REMOVE ME
 
 
-#print(top_50_data.iloc[:,:5].head())
 
 #Open the SQL connection and create a cursor
 
@@ -162,20 +190,19 @@ def sql(query):
 #Load our data into SQL tables
 
 sales_data.to_sql('Sales', conn, if_exists='replace', index=False)
-top_50_data.to_sql('Top_50', conn, if_exists='replace', index=False)
-gaming_study_data.to_sql('Gaming_Study', conn, if_exists='replace', index=False)
-online_behavior_data.to_sql('Online_Behavior', conn, if_exists='replace', index=False)
+gaming_study_avg.to_sql('Gaming_Study_Avg', conn, if_exists='replace', index=False)
 
-
-
-test = sql("""
-    SELECT Price, Singleplayer, Multiplayer
-    FROM Top_50
-    INNER JOIN Gaming_Study ON Gaming_Study.Name = Top_50.Name;
+sales_and_study = sql("""
+    SELECT *
+    FROM Gaming_Study_Avg
+    LEFT JOIN Sales ON Sales.Name = Gaming_Study_Avg.Name;
     """)
 
+#print(sales_data['Name'].isin(['Minecraft']).any()) #REMOVE ME
+sales_and_study.to_csv('sales_and_study.csv') #REMOVE ME
 
 
-print(sales_data.head())
+
+#print(sales_data.head()) REMOVE ME
 
 conn.close()
