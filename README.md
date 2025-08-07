@@ -13,6 +13,8 @@ As the data visualizations will be created in Tableau, the library requirements 
 
 ### Steps to run:
 
+Python 3.13 and Jupyter notebooks will need to be installed on your machine.
+
 1. Clone the repository either from the terminal or by downloading the zip file.
 2. In the terminal, navigate to the folder containing the cloned repository and run the following code:
     pip install -r requirements.txt
