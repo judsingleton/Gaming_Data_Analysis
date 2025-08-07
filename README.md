@@ -97,7 +97,9 @@ All visualizations can be accessed from the Tableau dashboard at https://public.
 Information about the mental health screening data found in the Gaming Study dataset can be found at the links below.
 
 Generalized Anxiety Disorder (GAD-7):  https://www.hiv.uw.edu/page/mental-health-screening/gad-7
+
 Social Phobia Inventory (SPIN):  https://psychology-tools.com/test/spin
+
 Satisfaction With Life Scale:  https://novopsych.com/assessments/well-being/satisfaction-with-life-scale-swls/
 
 There is surprisingly little difference between genre and the amount of time a player devotes towards gaming on average.  This remains the case when separating data out by gender.  This would seem to indicate any correlation between these two factors and player mental health is low.
