@@ -250,6 +250,21 @@ sales_and_study = sales_and_study.loc[:,~sales_and_study.columns.duplicated()]
 
 conn.close()
 
+sales_and_study.iat[1,5] = 'All'
+sales_and_study.iat[3,5] = 'PC'
+sales_and_study.iat[9,5] = 'All'
+
+sales_and_study.iat[3,7] = 'Strategy'
+sales_and_study.iat[9,7] = 'Strategy'
+
+sales_and_study.iat[3,8] = 2009
+sales_and_study.iat[9,8] = 2014
+
+#Missed updating these column names earlier.
+
+sales_data.rename(columns={"Global_Sales": "Global Sales"}, inplace=True)
+top_50_data.rename(columns={"Gross Revenue": "Global Sales"}, inplace=True)
+
 #Export our updated and new dataframes to CSV to be loaded into Tableau!
 
 sales_data.to_csv('Final_Data/Sales.csv', index=False)
