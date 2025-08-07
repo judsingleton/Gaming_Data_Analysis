@@ -29,7 +29,7 @@ From the terminal, enter the following commands.
 
 Gitbash:  
 
-python3 -m venv env
+python -m venv env
 source Scripts/activate
 
 Windows:  
@@ -39,7 +39,7 @@ Scripts\activate.bat
 
 Mac:  
 
-python3 -m venv env
+python -m venv env
 source env/bin/activate
 
 
