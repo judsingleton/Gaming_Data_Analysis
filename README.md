@@ -15,7 +15,7 @@ As the data visualizations will be created in Tableau, the library requirements 
 
 1. Clone the repository either from the terminal or by downloading the zip file.
 2. In the terminal, navigate to the folder containing the cloned repository and run the following code:
-    pip install -r requirements
+    pip install -r requirements.txt
 3. Open the project in Jupyter Notebook from the command line or terminal.
 4. If you are not in the correct location navigate to the directory containing the repository.
 5. Open Gaming_Data_Analysis.ipynb.
