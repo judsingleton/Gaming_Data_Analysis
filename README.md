@@ -5,7 +5,7 @@ The main question this analysis aims to answer is what correlation if any exists
 
 ## Project Objective 
 
-The objective of this project is to see what correlations can be found between a video game's sales and several other factors.  As these
+The objective of this project is to see what correlations can be found between a video game's sales and several other factors.  These include several mental health screening evaluations as well as the genre.  Questions to answer include whether game genre shows any noticeable correlation to mental health scores, genre profitability, and any possible correlation between the gamer's mental and social health and overall game profits.
 
 ## Project Setup Instructions
 
@@ -79,6 +79,9 @@ For sales, a dataset with sales figures for video games released between 1978 an
  | GAD_#, SPIN_#, SWL_# | These columns contain the score for a given question number on the specified screening test.  While not directly used in the analysis, they are retained for ease of additional further analysis. | int |
  | Platform | The video game platform (PC, console, mobile, etc.) the individual is using for the games. | string |
  | Global_Sales | The global sales in millions of dollars for the title. | float64 |
+ | Singleplayer | Whether the game has a single player mode. Calculated for top 50 dataset from Tags column.| bool |
+ | Multiplayer | Whether the game has a multi player mode. Calculated for top 50 dataset from Tags column.| bool |
+  | Tags | This column consists of lists of strings that describe each title.| Pandas series |
 
 
 ### Notes on data normalization:
@@ -89,7 +92,20 @@ Similary, for the top 50 dataset, Genre is not a pre-populated column.  Instead,
 
 ## Project Summary
 
-All visualizations can be accessed from the Tableau dashboard at https://public.tableau.com/app/profile/jud.singleton/viz/GamingDataAnalysisCapstone/Dashboard1?publish=yes.
+All visualizations can be accessed from the Tableau dashboard at https://public.tableau.com/app/profile/jud.singleton/viz/GamingDataAnalysisCapstone/GamingDataAnalysisCapstone?publish=yes
 
+Information about the mental health screening data found in the Gaming Study dataset can be found at the links below.
 
- 
+Generalized Anxiety Disorder (GAD-7):  https://www.hiv.uw.edu/page/mental-health-screening/gad-7
+Social Phobia Inventory (SPIN):  https://psychology-tools.com/test/spin
+Satisfaction With Life Scale:  https://novopsych.com/assessments/well-being/satisfaction-with-life-scale-swls/
+
+There is surprisingly little difference between genre and the amount of time a player devotes towards gaming on average.  This remains the case when separating data out by gender.  This would seem to indicate any correlation between these two factors and player mental health is low.
+
+Role-playing games, which tend to have more emphasis on long-term player progression than other genres, do have higher average scores for the mental health screenings than do strategy games or shooters.  Surprisingly, MMOs which are a distinct sub-genre of role-playing games that tends to heavily emphasize player progression, scored only neglibly higher on the GAD and noticeably lower on the SWL and SPIN evaluations.  Shooters scored the lowest in each category.
+
+There does not appear to be a strong correlation at first glance between mental health and the profitability of a video game.  MMOs and shooters have roughly equivalent average global revenue, with strategy and non-MMO role-playing games being noticeably less profitable on average.  
+
+One limitation of this analysis is simply a lack of available metnal health data for more titles.  While the listed titles on the Gaming Study dataset are popular titles and representative of their specific genres, not all genres are represented.  Additionally, the study is skewed towards established titles, with the most recent titles being released in 2014.  The other limitation is that the sales dataset captures revenue based on purchasing the game, but does not appear to include revenue for games that are free to download but include in-game purchases, as neither Hearthstone nor League of Legends require an initial purchase.
+
+For further analysis, age and location data have been left in the datasets but not specifically explored here.  Additionally, if more granular data is desired, the scores for the individual questions on the mental health assessments have been retained on the Gaming Study CSV file in the Final_Data folder.
