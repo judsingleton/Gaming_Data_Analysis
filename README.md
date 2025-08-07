@@ -29,17 +29,17 @@ From the terminal, enter the following commands.
 
 Gitbash:  
 
-python -m venv env
+python -m venv Gaming_Data_Analysis
 source Scripts/activate
 
 Windows:  
 
-python -m venv env
+python -m venv Gaming_Data_Analysis
 Scripts\activate.bat
 
 Mac:  
 
-python -m venv env
+python -m venv Gaming_Data_Analysis
 source env/bin/activate
 
 
