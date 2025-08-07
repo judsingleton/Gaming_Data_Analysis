@@ -69,7 +69,9 @@ https://www.reddit.com/r/gamedev/comments/1hy9ljz/i_collected_data_from_the_top_
 
 ## Data Summary
 
-For sales, a dataset with sales figures for video games released between 1978 and 2024 is examined, as well as a dataset consisting of the top 50 games in each publisher category of AAA, AA, and independent or 'indie'.  A dataset consisting of data from users consisting of time spent playing games as well as engagement level is examined.  Finally, an in-depth study of ten representative video games and their players' score on various mental health screening tools will be explored.
+For sales, a dataset with sales figures (with just shy of 64 thousand rows) for video games released between 1978 and 2024 is examined, as well as a dataset consisting of the top 50 games in each publisher category of AAA, AA, and independent or 'indie'.  A dataset of approximately 40 thousands rows consisting of data from users consisting of time spent playing games as well as engagement level is examined.  Finally, an in-depth study of ten representative video games consisting of over 13 thousand rows and their players' score on various mental health screening tools will be explored.  
+
+I found that while there does appear to be some slight correlation between genre and mental health scores, there does not appear to be one between genre and revenue.  As such, this would seem to imply a weak correlation if any between game revenue and the mental health scores of the players.
 
 ### Data Dictionary 
  | Column Name | Description | Data Type |
