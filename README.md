@@ -94,7 +94,7 @@ Similary, for the top 50 dataset, Genre is not a pre-populated column.  Instead,
 
 All visualizations can be accessed from the Tableau dashboard at https://public.tableau.com/app/profile/jud.singleton/viz/GamingDataAnalysisCapstone/GamingDataAnalysisCapstone?publish=yes
 
-Information about the mental health screening data found in the Gaming Study dataset can be found at the links below.
+Information about the mental health screening data found in the Gaming Study dataset can be found at the links below.  Note that on the first two tests a higher number indicates a negative outcome (higher anxiety or social phobia) while on the SWL a higher score indicates a higher satisfaction with life.  No units are used for any of the tests.
 
 Generalized Anxiety Disorder (GAD-7):  https://www.hiv.uw.edu/page/mental-health-screening/gad-7
 
@@ -104,7 +104,7 @@ Satisfaction With Life Scale:  https://novopsych.com/assessments/well-being/sati
 
 There is surprisingly little difference between genre and the amount of time a player devotes towards gaming on average.  This remains the case when separating data out by gender.  This would seem to indicate any correlation between these two factors and player mental health is low.
 
-Role-playing games, which tend to have more emphasis on long-term player progression than other genres, do have higher average scores for the mental health screenings than do strategy games or shooters.  Surprisingly, MMOs which are a distinct sub-genre of role-playing games that tends to heavily emphasize player progression, scored only neglibly higher on the GAD and noticeably lower on the SWL and SPIN evaluations.  Shooters scored the lowest in each category.
+Role-playing games, which tend to have more emphasis on long-term player progression than other genres, do have higher average scores for the mental health screenings than do strategy games or shooters.  Surprisingly, MMOs which are a distinct sub-genre of role-playing games that tends to heavily emphasize player progression, scored only neglibly higher on the GAD lower on the SWL, but also lower SPIN evaluations.  Shooters scored the lowest in each category.
 
 There does not appear to be a strong correlation at first glance between mental health and the profitability of a video game.  MMOs and shooters have roughly equivalent average global revenue, with strategy and non-MMO role-playing games being noticeably less profitable on average.  
 
